@@ -20,7 +20,6 @@ CREATE TABLE "power_plants" (
     "wepp_id" int   NOT NULL,
     "year_of_capacity_data" int   NOT NULL,
     "generation_gwh_2017" int   NOT NULL,
-    "estimated_generation_gwh" int   NOT NULL,
     CONSTRAINT "pk_power_plants" PRIMARY KEY (
         "id"
      )
