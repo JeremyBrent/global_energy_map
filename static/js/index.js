@@ -4,12 +4,25 @@ const API_KEY =
 var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
 var stateSelect = d3.select("#state_select");
-console.log(stateSelect);
+var energySelect = d3.select("#energy_select");
+
+// function dropDownSelect(dropDown, dropDownValue) {
+//   var dropDownValue = dropDown.node().value;
+//   return dropDownValue
+// }
+
+
+energySelect.on("change", () => {
+  var energySelectValue = energySelect.node().value;
+  console.log(energySelectValue);
+});
 
 stateSelect.on("change", () => {
-  var stateValue = stateSelect.node().value;
-  console.log(stateValue);
+  var stateSelectValue = stateSelect.node().value;
+  console.log(stateSelectValue)
 });
+
+
 
 d3.csv(dataset).then((data) => {
   console.log(data);
@@ -23,7 +36,7 @@ d3.csv(dataset).then((data) => {
     d.year_of_capacity_data = +d.year_of_capacity_data;
   });
 
-  d3.select("#energy_select")
+
   // console.log(data)
   //     // // Create a new marker cluster group
   //     var markerClusterGroup = L.markerClusterGroup();
@@ -46,7 +59,7 @@ d3.csv(dataset).then((data) => {
 });
 // Creating map object
 var myMap = L.map("map", {
-  center: [40.7, -73.95],
+  center: [39.8283, -98.5795],
   zoom: 4,
 });
 

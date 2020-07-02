@@ -17,7 +17,7 @@ html {
     position: absolute;
     z-index: 0;
     margin-right: 50px;
-    box-shadow: rgba(0,0,0,1);
+    box-shadow: 0px 0px 15px rgba(0,0,0,1);
 }
 
 .header-container {
@@ -56,9 +56,10 @@ html {
     right:0; 
     text-align:center;
     z-index: 1;
-    
 }
 
 .panel-group {
     margin-left:50px;
+    box-shadow: 0px 0px 15px;
+    border-radius: 5px
 }
