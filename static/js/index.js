@@ -3,39 +3,47 @@ const API_KEY =
 
 var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
-d3.csv(dataset).then((data) => {
-  console.log(data)
+var stateSelect = d3.select("#state_select");
+console.log(stateSelect);
 
-  data.forEach(d => {
+stateSelect.on("change", () => {
+  var stateValue = stateSelect.node().value;
+  console.log(stateValue);
+});
+
+d3.csv(dataset).then((data) => {
+  console.log(data);
+
+  data.forEach((d) => {
     d.capacity_mw = +d.capacity_mw;
     d.commissioning_year = +d.commissioning_year;
     d.generation_gwh_2017 = +d.generation_gwh_2017;
     d.id = +d.id;
     d.wepp_id = +d.wepp_id;
     d.year_of_capacity_data = +d.year_of_capacity_data;
-})
+  });
 
+  d3.select("#energy_select")
   // console.log(data)
-//     // // Create a new marker cluster group
-//     var markerClusterGroup = L.markerClusterGroup();
+  //     // // Create a new marker cluster group
+  //     var markerClusterGroup = L.markerClusterGroup();
 
-//     // // Loop through data
-//     for (var i = 0; i < data.length; i++ ) {
-  
-//       // Set the data location property to a variable
-//       var location = [data[i].latitude, data[i].longitude] ;
-  
-//       // Check for location property
-//       if (location) {
-//         // Add a new marker to the cluster group and bind a pop-up
-//         markerClusterGroup.addLayer(L.marker(location))
+  //     // // Loop through data
+  //     for (var i = 0; i < data.length; i++ ) {
 
-//       };
-//     }
-//     // Add our marker cluster layer to the map
-//     markerClusterGroup.addTo(myMap);
+  //       // Set the data location property to a variable
+  //       var location = [data[i].latitude, data[i].longitude] ;
 
-})
+  //       // Check for location property
+  //       if (location) {
+  //         // Add a new marker to the cluster group and bind a pop-up
+  //         markerClusterGroup.addLayer(L.marker(location))
+
+  //       };
+  //     }
+  //     // Add our marker cluster layer to the map
+  //     markerClusterGroup.addTo(myMap);
+});
 // Creating map object
 var myMap = L.map("map", {
   center: [40.7, -73.95],
@@ -56,7 +64,4 @@ L.tileLayer(
   }
 ).addTo(myMap);
 
-
 // Grab the data with d3
-
-    
