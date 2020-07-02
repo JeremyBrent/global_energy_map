@@ -1,10 +1,21 @@
 const API_KEY =
   "pk.eyJ1IjoiamVyZW15YnJlbnQiLCJhIjoiY2tiaWh0YzF2MGZkazJybThkcWtob2Y3MyJ9.nWks4cNoybDOq9i2jGGywg";
 
-var dataset = "../../Assets/Data/clean_USA_power_plant_data.csv";
+var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
-// d3.csv(dataset, function(data){ 
-  
+d3.csv(dataset).then((data) => {
+  console.log(data)
+
+  data.forEach(d => {
+    d.capacity_mw = +d.capacity_mw;
+    d.commissioning_year = +d.commissioning_year;
+    d.generation_gwh_2017 = +d.generation_gwh_2017;
+    d.id = +d.id;
+    d.wepp_id = +d.wepp_id;
+    d.year_of_capacity_data = +d.year_of_capacity_data;
+})
+
+  // console.log(data)
 //     // // Create a new marker cluster group
 //     var markerClusterGroup = L.markerClusterGroup();
 
@@ -23,8 +34,8 @@ var dataset = "../../Assets/Data/clean_USA_power_plant_data.csv";
 //     }
 //     // Add our marker cluster layer to the map
 //     markerClusterGroup.addTo(myMap);
-// });
 
+})
 // Creating map object
 var myMap = L.map("map", {
   center: [40.7, -73.95],

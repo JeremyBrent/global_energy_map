@@ -13,7 +13,7 @@ html {
 }
 
 #map {
-    height: 400px;
+    height: 500px;
     width:100%;
     border-radius: 5px;
     position: absolute;
@@ -22,7 +22,8 @@ html {
 }
 
 .container {
-    margin-top: 100px
+    margin-top: 100px;
+    height:100%
 }
 
 .header {
@@ -43,4 +44,8 @@ html {
     text-align:center;
     z-index: 1;
     
+}
+
+.panel-group {
+    margin-left:50px;
 }
