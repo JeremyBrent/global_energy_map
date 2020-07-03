@@ -6,7 +6,6 @@ body {
 body,
 html {
     height: 100%;
-    
 }
 
 
@@ -61,4 +60,19 @@ html {
 .panel-group {
     margin-left:50px;
     border-radius: 5px
+}
+
+@media screen and (max-width:768px) {
+    .panel-group {
+        margin-left:0px;
+        margin-top: 525px;
+    }
+
+    body {
+        width:fit-content;
+    }
+
+    #table-area {
+        padding-top: 250px
+    }
 }
