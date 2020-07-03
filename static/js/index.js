@@ -12,6 +12,12 @@ var yearSelect = d3.select("#year_select");
 //   return dropDownValue
 // }
 
+function thousands_separators(num){
+    var num_parts = num.toString().split(".");
+    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num_parts.join(".");
+  }
+
 energySelect.on("change", () => {
   var energySelectValue = energySelect.node().value;
   console.log(energySelectValue);
@@ -83,17 +89,48 @@ d3.csv(dataset).then((data) => {
     return acc;
   }, {}));
 
-  var tableData = redux(data)
+  var almostTableData = redux(data)
+  console.log(tableData)
+  console.log(columnNames)
 
-  tableData.forEach((earthQuake) => {
-    // console.log(ufoRecord)
-    var trow = tbody.append("tr");
-    Object.entries(earthQuake).forEach(([key, value]) => {
-        // console.log(key, value);
-        var cell = trow.append("td");
-        cell.text(value);
-    })
-})
+  var tableData = almostTableData.map(Object.values);
+  console.log(tableData)
+  // var columnNameArray = []
+
+  // for (var i = 0; i < columnNames.length; i++) {
+  //   var columnNameObj = {}
+  //   columnNameObj['title'] = columnNames[i]
+  //   // columnNameArray.push({title:columnNames[i]});
+  //   columnNameArray.push(columnNameObj)
+  // }
+  
+  // console.log(columnNameArray);
+
+  $(document).ready( function () {
+    $('#energy-table').DataTable({
+      data: tableData,
+      columns: [
+        {title : "Name"},
+        {title : "State"},
+        {title : "Commissioning year"},
+        {title : "Primary fuel"},
+        {title : "Latitude"},
+        {title : "Longitude"},
+        {title : "Energy Generation (gwh, 2017)"},
+      ]
+    });
+  } );
+
+
+  // tableData.forEach((earthQuake) => {
+  //   // console.log(ufoRecord)
+  //   var trow = tbody.append("tr");
+  //   Object.entries(earthQuake).forEach(([key, value]) => {
+  //       // console.log(key, value);
+  //       var cell = trow.append("td");
+  //       cell.text(value);
+  //   })
+// })
 
   
   
@@ -125,3 +162,23 @@ L.tileLayer(
 ).addTo(myMap);
 
 // Grab the data with d3
+
+var myMap2 = L.map("map2", {
+  center: [39.8283, -98.5795],
+  zoom: 4,
+});
+
+// Adding tile layer to the map
+L.tileLayer(
+  "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+  {
+    attribution:
+      "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: "mapbox/streets-v11",
+    accessToken: API_KEY,
+  }
+).addTo(myMap2);
+
