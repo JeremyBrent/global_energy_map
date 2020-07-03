@@ -5,7 +5,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 from config import username, password, username_heroku, password_heroku, database_heroku, host_heroku
 
@@ -28,29 +28,10 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
-        f"/api/v1.0/countries<br/>"
-        f"/api/v1.0/testing"
+        f"/api/v1.0/testing<br/>"
+        f"/api/v1.0/input_testing/insert_fuel_type_here</br>"
+        f"/api/v1.0/input_testing/insert_commissioning_year_here"
     )
-
-@app.route("/api/v1.0/countries")
-def names():
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
-
-    """Return a list of all passenger names"""
-    # Query all passengers
-    # results = session.query(" country_long from power_plants ").all()
-    
-    results2 = session.query("power_plants_data.country").all()
-
-    session.close()
-
-    # Convert list of tuples into normal list
-    all_names = list(np.ravel(results2))
-    unique_countries = list(np.ravel(results2))
-
-    # return jsonify(all_names)
-    return jsonify(unique_countries)
 
 
 @app.route("/api/v1.0/testing")
@@ -60,7 +41,7 @@ def power_plant_filter():
 
     """Return a list of all Power Plants depending on filter"""
     
-    results3 = session.query(power_plants_data).filter_by(primary_fuel='Gas').all()
+    results3 = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(primary_fuel='Gas').all()
     # for row in results3:
     #     print(f'Plant Name: {row.name} ||| Capacity (MW): {row.capacity_mw} ||| Fuel Type: {row.primary_fuel}')
 
@@ -69,18 +50,104 @@ def power_plant_filter():
 
     # Failed Attempt to return all results
 
-    # all_rows = []
-    # for name, capacity_mw, primary_fuel in results3:
-    #     test_dict = {}
-    #     test_dict["name"] = name
-    #     test_dict["capacity_mw"] = capacity_mw
-    #     test_dict["primary_fuel"] = primary_fuel
-    #     all_rows.append(test_dict)
-    # return jsonify(all_rows)
+    all_rows = []
+    for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in results3:
+        test_dict = {}
+        test_dict["name"] = name
+        test_dict["owner"] = owner
+        test_dict["latitude"] = float(latitude)
+        test_dict["longtitude"] = float(longitude)
+        test_dict["capacity_mw"] = float(capacity_mw)
+        test_dict["primary_fuel"] = primary_fuel
+        test_dict["commissioning_year"] = commissioning_year
+        all_rows.append(test_dict)
+    unique_countries = list(np.ravel(results3))
+    print(all_rows)
 
-    for row in results3:
-        return(f'Plant Name: {row.name} ||| Capacity (MW): {row.capacity_mw} ||| Fuel Type: {row.primary_fuel}')
 
+    return jsonify(all_rows)
+    # return render_template("index.html", rows=all_rows)
+
+
+@app.route("/api/v1.0/input_testing/<fuel_type>")
+def filter_function(fuel_type):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # fuel_type_input = input('Enter Fuel Type: ')
+    test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(primary_fuel= fuel_type).all()
+    
+    session.close()
+    
+    all_rows_2 = []
+    for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in test_filter:
+        test_dict = {}
+        test_dict["name"] = name
+        test_dict["owner"] = owner
+        test_dict["latitude"] = float(latitude)
+        test_dict["longtitude"] = float(longitude)
+        test_dict["capacity_mw"] = float(capacity_mw)
+        test_dict["primary_fuel"] = primary_fuel
+        test_dict["commissioning_year"] = commissioning_year
+        all_rows_2.append(test_dict)
+    unique_countries = list(np.ravel(test_filter))
+    print(all_rows_2)
+
+    return jsonify(all_rows_2)
+
+@app.route("/api/v1.0/input_testing/<string:year_input>")
+def filter_function2(year_input):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    # year_input is a string
+    # year_input = input('Enter Year: ')
+    test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(commissioning_year = year_input).all()
+    
+    session.close()
+    
+    all_rows_3 = []
+    for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in test_filter:
+        test_dict = {}
+        test_dict["name"] = name
+        test_dict["owner"] = owner
+        test_dict["latitude"] = float(latitude)
+        test_dict["longtitude"] = float(longitude)
+        test_dict["capacity_mw"] = float(capacity_mw)
+        test_dict["primary_fuel"] = primary_fuel
+        test_dict["commissioning_year"] = commissioning_year
+        all_rows_3.append(test_dict)
+    unique_countries = list(np.ravel(test_filter))
+    print(all_rows_3)
+
+    return jsonify(all_rows_3)
+
+
+# @app.route("/api/v1.0/input_testing/<state>")
+# def filter_function(state):
+#     # Create our session (link) from Python to the DB
+#     session = Session(engine)
+
+#     # state_input = input('Enter State: ')
+#     test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.state, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(state= state).all()
+    
+#     session.close()
+    
+#     all_rows_3 = []
+#     for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in test_filter:
+#         test_dict = {}
+#         test_dict["name"] = name
+#         test_dict["owner"] = owner
+#         test_dict["latitude"] = float(latitude)
+#         test_dict["longtitude"] = float(longitude)
+#         test_dict["capacity_mw"] = float(capacity_mw)
+#         test_dict["primary_fuel"] = primary_fuel
+#         test_dict["commissioning_year"] = commissioning_year
+#         all_rows_3.append(test_dict)
+#     unique_countries = list(np.ravel(test_filter))
+#     print(all_rows_3)
+
+#     return jsonify(all_rows_3)
 
 if __name__ == '__main__':
     app.run(debug=True)
