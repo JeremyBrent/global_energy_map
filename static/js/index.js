@@ -3,33 +3,53 @@ const API_KEY =
 
 var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
-var stateSelect = d3.select("#state_select");
-var energySelect = d3.select("#energy_select");
-var yearSelect = d3.select("#year_select");
+function thousands_separators(num){
+  var num_parts = num.toString().split(".");
+  num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return num_parts.join(".");
+}
+
+var locationStateSelect = d3.select("#location_state_select");
+var locationEnergySelect = d3.select("#location_energy_select");
+var locationYearSelect = d3.select("#location_year_select");
+
+var prodStateSelect = d3.select("#prod_state_select");
+var prodEnergySelect = d3.select("#prod_energy_select");
+var prodYearSelect = d3.select("#prod_year_select");
 
 // function dropDownSelect(dropDown, dropDownValue) {
 //   var dropDownValue = dropDown.node().value;
 //   return dropDownValue
 // }
 
-function thousands_separators(num){
-    var num_parts = num.toString().split(".");
-    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return num_parts.join(".");
-  }
 
-energySelect.on("change", () => {
-  var energySelectValue = energySelect.node().value;
-  console.log(energySelectValue);
-});
-
-stateSelect.on("change", () => {
-  var stateSelectValue = stateSelect.node().value;
+locationStateSelect.on("change", () => {
+  var stateSelectValue = locationStateSelect.node().value;
   console.log(stateSelectValue);
 });
 
-yearSelect.on("change", () => {
-  var yearSelectValue = yearSelect.node().value;
+locationEnergySelect.on("change", () => {
+  var energySelectValue = locationEnergySelect.node().value;
+  console.log(energySelectValue);
+});
+
+locationYearSelect.on("change", () => {
+  var yearSelectValue = locationYearSelect.node().value;
+  console.log(yearSelectValue);
+});
+
+prodStateSelect.on("change", () => {
+  var stateSelectValue = prodStateSelect.node().value;
+  console.log(stateSelectValue);
+});
+
+prodEnergySelect.on("change", () => {
+  var energySelectValue = prodEnergySelect.node().value;
+  console.log(energySelectValue);
+});
+
+prodYearSelect.on("change", () => {
+  var yearSelectValue = prodYearSelect.node().value;
   console.log(yearSelectValue);
 });
 
@@ -48,10 +68,19 @@ d3.csv(dataset).then((data) => {
   var difYears = [
     ...new Set(data.map((x) => x.commissioning_year).sort((a, b) => b - a)),
   ];
-  var dateList = d3.select("#year_select");
+
+  var difEnergy = [
+    ...new Set(data.map((x) => x.primary_fuel).sort()),
+  ];
 
   for (var i = 0; i < difYears.length; i++) {
-    dateList.append("option").attr("value", `${difYears[i]}`).text(difYears[i]);
+    locationYearSelect.append("option").attr("value", `${difYears[i]}`).text(difYears[i]);
+    prodYearSelect.append("option").attr("value", `${difYears[i]}`).text(difYears[i]);
+  }
+
+  for (var i = 0; i < difEnergy.length; i++) {
+    locationEnergySelect.append("option").attr("value", `${difEnergy[i]}`).text(difEnergy[i]);
+    prodEnergySelect.append("option").attr("value", `${difEnergy[i]}`).text(difEnergy[i]);
   }
 
   // console.log(data)

@@ -88,6 +88,14 @@ html {
     border-radius: 5px
 }
 
+.citation {
+    text-align:right;
+    margin:15px;
+    margin-right: 0px;
+    display:block;
+    font-size:15px;
+  }
+
 @media screen and (max-width:768px) {
     .panel-group {
         margin-left:0px;
