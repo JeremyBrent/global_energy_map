@@ -90,10 +90,30 @@ def filter_function(fuel_type):
         test_dict["primary_fuel"] = primary_fuel
         test_dict["commissioning_year"] = commissioning_year
         all_rows_2.append(test_dict)
-    unique_countries = list(np.ravel(test_filter))
+
     print(all_rows_2)
 
-    return jsonify(all_rows_2)
+    avg_gwh_list = []
+    gwh_produced = session.query(power_plants_data.generation_gwh_2017).filter_by(primary_fuel= fuel_type).all()
+    avg_gwh_list.append(gwh_produced)
+    avg_gwh = np.mean(avg_gwh_list)
+
+    print("---------------------------------------------------")
+    print(f'Average GWH Produced from {fuel_type}: {avg_gwh}')
+    # unique_countries = list(np.ravel(test_filter))
+
+    total_gwh_list = []
+    total_gwh_list.append(gwh_produced)
+    total_gwh = np.sum(total_gwh_list)
+    print("---------------------------------------------------")
+    print(f'Total GWH Produced from {fuel_type}: {total_gwh}')    
+
+    # return jsonify(all_rows_2)
+    return (
+        f'{jsonify}({all_rows_2})' '<br/>'
+        f'The Average GWH produced by {fuel_type}: {avg_gwh}' '<br/>'
+        f'Total GWH Produced from {fuel_type}: {total_gwh}'
+        )
 
 @app.route("/api/v1.0/input_testing/<string:year_input>")
 def filter_function2(year_input):
