@@ -3,11 +3,11 @@ const API_KEY =
 
 var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
-function thousands_separators(num){
-  var num_parts = num.toString().split(".");
-  num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return num_parts.join(".");
-}
+// function thousands_separators(num) {
+//   var num_parts = num.toString().split(".");
+//   num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+//   return num_parts.join(".");
+// }
 
 var locationStateSelect = d3.select("#location_state_select");
 var locationEnergySelect = d3.select("#location_energy_select");
@@ -17,16 +17,14 @@ var prodStateSelect = d3.select("#prod_state_select");
 var prodEnergySelect = d3.select("#prod_energy_select");
 var prodYearSelect = d3.select("#prod_year_select");
 
-// function dropDownSelect(dropDown, dropDownValue) {
-//   var dropDownValue = dropDown.node().value;
-//   return dropDownValue
-// }
+function dropDownSelect(dropDown, dropDownValue) {
+  var dropDownValue = dropDown.property("value");
+  return dropDownValue
+}
 
 
-locationStateSelect.on("change", () => {
-  var stateSelectValue = locationStateSelect.node().value;
-  console.log(stateSelectValue);
-});
+var stateSelectValue;
+locationStateSelect.on("change", dropDownSelect(locationStateSelect, stateSelectValue));
 
 locationEnergySelect.on("change", () => {
   var energySelectValue = locationEnergySelect.node().value;
@@ -69,18 +67,28 @@ d3.csv(dataset).then((data) => {
     ...new Set(data.map((x) => x.commissioning_year).sort((a, b) => b - a)),
   ];
 
-  var difEnergy = [
-    ...new Set(data.map((x) => x.primary_fuel).sort()),
-  ];
+  var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
 
   for (var i = 0; i < difYears.length; i++) {
-    locationYearSelect.append("option").attr("value", `${difYears[i]}`).text(difYears[i]);
-    prodYearSelect.append("option").attr("value", `${difYears[i]}`).text(difYears[i]);
+    locationYearSelect
+      .append("option")
+      .attr("value", `${difYears[i]}`)
+      .text(difYears[i]);
+    prodYearSelect
+      .append("option")
+      .attr("value", `${difYears[i]}`)
+      .text(difYears[i]);
   }
 
   for (var i = 0; i < difEnergy.length; i++) {
-    locationEnergySelect.append("option").attr("value", `${difEnergy[i]}`).text(difEnergy[i]);
-    prodEnergySelect.append("option").attr("value", `${difEnergy[i]}`).text(difEnergy[i]);
+    locationEnergySelect
+      .append("option")
+      .attr("value", `${difEnergy[i]}`)
+      .text(difEnergy[i]);
+    prodEnergySelect
+      .append("option")
+      .attr("value", `${difEnergy[i]}`)
+      .text(difEnergy[i]);
   }
 
   // console.log(data)
@@ -104,73 +112,55 @@ d3.csv(dataset).then((data) => {
             `)
       );
     }
-  } // Add our marker cluster layer to the map
+  }
+
+  // Add our marker cluster layer to the map
   markerClusterGroup.addTo(myMap);
+});
 
-  var tbody = d3.select("#energy-tablebody");
+// Loop to build the table
+d3.csv(dataset).then((data) => {
+  var columnNames = [
+    "name",
+    "state",
+    "commissioning_year",
+    "primary_fuel",
+    "latitude",
+    "longitude",
+    "generation_gwh_2017",
+  ];
 
-  
-  var columnNames = ["name", "state", "commissioning_year", "primary_fuel" , 
-  "latitude", "longitude", "generation_gwh_2017"];
+  const redux = (array) =>
+    array.map((o) =>
+      columnNames.reduce((acc, curr) => {
+        acc[curr] = o[curr];
+        return acc;
+      }, {})
+    );
 
-  const redux = array => array.map(o => columnNames.reduce((acc, curr) => {
-    acc[curr] = o[curr];
-    return acc;
-  }, {}));
-
-  var almostTableData = redux(data)
-  console.log(tableData)
-  console.log(columnNames)
+  var almostTableData = redux(data);
 
   var tableData = almostTableData.map(Object.values);
-  console.log(tableData)
-  // var columnNameArray = []
 
-  // for (var i = 0; i < columnNames.length; i++) {
-  //   var columnNameObj = {}
-  //   columnNameObj['title'] = columnNames[i]
-  //   // columnNameArray.push({title:columnNames[i]});
-  //   columnNameArray.push(columnNameObj)
-  // }
-  
-  // console.log(columnNameArray);
-
-  $(document).ready( function () {
-    $('#energy-table').DataTable({
+  $(document).ready(function () {
+    $("#energy-table").DataTable({
       data: tableData,
       columns: [
-        {title : "Name"},
-        {title : "State"},
-        {title : "Commissioning year"},
-        {title : "Primary fuel"},
-        {title : "Latitude"},
-        {title : "Longitude"},
-        {title : "Energy Generation (gwh, 2017)"},
-      ]
+        { title: "Name" },
+        { title: "State" },
+        { title: "Commissioning year" },
+        { title: "Primary fuel" },
+        { title: "Latitude" },
+        { title: "Longitude" },
+        { title: "Energy Generation (gwh, 2017)" },
+      ],
     });
-  } );
-
-
-  // tableData.forEach((earthQuake) => {
-  //   // console.log(ufoRecord)
-  //   var trow = tbody.append("tr");
-  //   Object.entries(earthQuake).forEach(([key, value]) => {
-  //       // console.log(key, value);
-  //       var cell = trow.append("td");
-  //       cell.text(value);
-  //   })
-// })
-
-  
-  
-  // for (const [key, value] of Obe) {
-  //   Object.entries(data)
-  // }
- 
+  });
 });
 
 
-// Creating map object
+// Map 1
+// Map of geolocations
 var myMap = L.map("map", {
   center: [39.8283, -98.5795],
   zoom: 4,
@@ -190,7 +180,8 @@ L.tileLayer(
   }
 ).addTo(myMap);
 
-// Grab the data with d3
+// Map 2
+// Choropleth of production
 
 var myMap2 = L.map("map2", {
   center: [39.8283, -98.5795],
@@ -210,4 +201,3 @@ L.tileLayer(
     accessToken: API_KEY,
   }
 ).addTo(myMap2);
-
