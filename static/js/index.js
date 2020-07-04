@@ -122,40 +122,50 @@ d3.csv(dataset).then((data) => {
 
   var markerClusterGroup = L.markerClusterGroup();
 
+  var markerArray = [];
+
   for (var i = 0; i < reducedData.length; i++) {
     allLocations = [reducedData[i].latitude, reducedData[i].longitude];
 
-    markerClusterGroup.addLayer(
-      L.marker(allLocations).bindPopup(`
+    var marker = L.marker(allLocations).bindPopup(`
           <p><strong> Name: </strong> ${reducedData[i].name} </p>
           <hr>
           <p><strong> Commission Year: </strong> ${reducedData[i].commissioning_year} </p>
           <p><strong> Primary Fuel Type: </strong> ${reducedData[i].primary_fuel} </p>
-        `)
-    );
+        `);
+    markerArray.push(marker);
   }
+
+  markerClusterGroup.addLayers(markerArray);
   // Add our marker cluster layer to the map
   markerClusterGroup.addTo(myMap);
 
   locationEnergySelect.on("change", () => {
+    // markerArray = [];
+    // markerClusterGroup = L.markerClusterGroup();
     var energySelectValue = locationEnergySelect.node().value;
     var filteredData = filterByEnergy(reducedData, energySelectValue);
 
+    // console.log(markerClusterGroup)
+    markerClusterGroup.clearLayers(markerArray);
+
     // Check for location property
     if (energySelectValue == "All") {
+      
       for (var i = 0; i < reducedData.length; i++) {
         allLocations = [reducedData[i].latitude, reducedData[i].longitude];
 
-        markerClusterGroup.addLayer(
-          L.marker(allLocations).bindPopup(`
+        marker = L.marker(allLocations).bindPopup(`
                 <p><strong> Name: </strong> ${reducedData[i].name} </p>
                 <hr>
                 <p><strong> Commission Year: </strong> ${reducedData[i].commissioning_year} </p>
                 <p><strong> Primary Fuel Type: </strong> ${reducedData[i].primary_fuel} </p>
-              `)
-        );
+              `);
+        markerArray.push(marker);
       }
+      markerClusterGroup.addLayers(markerArray);
     } else {
+      
       // // Loop through data
       for (var i = 0; i < filteredData.length; i++) {
         // Set the data location property to a variable
@@ -163,15 +173,16 @@ d3.csv(dataset).then((data) => {
           filteredData[i].latitude,
           filteredData[i].longitude,
         ];
-        markerClusterGroup.addLayer(
-          L.marker(filteredLocations).bindPopup(`
+
+        marker = L.marker(filteredLocations).bindPopup(`
               <p><strong> Name: </strong> ${filteredData[i].name} </p>
               <hr>
               <p><strong> Commission Year: </strong> ${filteredData[i].commissioning_year} </p>
               <p><strong> Primary Fuel Type: </strong> ${filteredData[i].primary_fuel} </p>
-            `)
-        );
+            `);
+        markerArray.push(marker);
       }
+      markerClusterGroup.addLayers(markerArray);
     }
     // Add our marker cluster layer to the map
     markerClusterGroup.addTo(myMap);
@@ -282,8 +293,8 @@ d3.csv(dataset).then((data) => {
     var dataStationsSum = sum.toFixed(2);
     var dataStationsAvg = (dataStationsSum / dataStationsCount).toFixed(2);
     if (value == "All") {
-      tbody.append("td").text(numberWithCommas(allStationsCountComma));
-      tbody.append("td").text(numberWithCommas(allStationsSumComma));
+      tbody.append("td").text(numberWithCommas(allStationsCount));
+      tbody.append("td").text(numberWithCommas(allStationsSum));
       tbody.append("td").text(numberWithCommas(allStationsAvg));
     } else {
       tbody.append("td").text(numberWithCommas(dataStationsCount));
