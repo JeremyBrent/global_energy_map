@@ -3,12 +3,6 @@ const API_KEY =
 
 var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
 
-// function thousands_separators(num) {
-//   var num_parts = num.toString().split(".");
-//   num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-//   return num_parts.join(".");
-// }
-
 var locationStateSelect = d3.select("#location_state_select");
 var locationEnergySelect = d3.select("#location_energy_select");
 var locationYearSelect = d3.select("#location_year_select");
@@ -17,14 +11,30 @@ var prodStateSelect = d3.select("#prod_state_select");
 var prodEnergySelect = d3.select("#prod_energy_select");
 var prodYearSelect = d3.select("#prod_year_select");
 
-function dropDownSelect(dropDown, dropDownValue) {
-  var dropDownValue = dropDown.property("value");
-  return dropDownValue
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// function dropDownSelect(dropDown, dropDownValue) {
+//   var dropDownValue = dropDown.property("value");
+//   return dropDownValue
+// }
+
+// Function to filter data based on fuel type
+function filter(dataset, energyType) {
+  var statsData = dataset.filter((data) => data.primary_fuel == energyType);
+  return statsData;
 }
 
 
-var stateSelectValue;
-locationStateSelect.on("change", dropDownSelect(locationStateSelect, stateSelectValue));
+
+// var stateSelectValue;
+// locationStateSelect.on("change", dropDownSelect(locationStateSelect, stateSelectValue));
+
+locationStateSelect.on("change", () => {
+  var stateSelectValue = locationStateSelect.node().value;
+  console.log(stateSelectValue);
+});
 
 locationEnergySelect.on("change", () => {
   var energySelectValue = locationEnergySelect.node().value;
@@ -51,6 +61,8 @@ prodYearSelect.on("change", () => {
   console.log(yearSelectValue);
 });
 
+//////////
+// Data extraction for maps 
 d3.csv(dataset).then((data) => {
   console.log(data);
 
@@ -113,12 +125,12 @@ d3.csv(dataset).then((data) => {
       );
     }
   }
-
   // Add our marker cluster layer to the map
   markerClusterGroup.addTo(myMap);
 });
 
-// Loop to build the table
+//////////
+// Data extraction to build the table
 d3.csv(dataset).then((data) => {
   var columnNames = [
     "name",
@@ -130,13 +142,15 @@ d3.csv(dataset).then((data) => {
     "generation_gwh_2017",
   ];
 
+  // Function to reduce data object to specific properties
   const redux = (array) =>
-    array.map((o) =>
-      columnNames.reduce((acc, curr) => {
-        acc[curr] = o[curr];
-        return acc;
-      }, {})
-    );
+  array.map((o) =>
+    columnNames.reduce((acc, curr) => {
+      acc[curr] = o[curr];
+      return acc;
+    }, {})
+  );
+
 
   var almostTableData = redux(data);
 
@@ -158,6 +172,87 @@ d3.csv(dataset).then((data) => {
   });
 });
 
+
+
+function quantity(dataset) {
+  var total = dataset.length;
+  return total;
+}
+
+//////////
+// Data extraction for stats table
+d3.csv(dataset).then((data) => {
+
+  var columnNames = [
+    "primary_fuel",
+    "generation_gwh_2017",
+  ];
+
+  const redux = (array) =>
+  array.map((o) =>
+    columnNames.reduce((acc, curr) => {
+      acc[curr] = o[curr];
+      return acc;
+    }, {})
+  );
+
+  var almostTableData = redux(data);
+  
+  almostTableData.forEach((d) => {
+    d.generation_gwh_2017 = +d.generation_gwh_2017;
+  });
+
+  console.log(almostTableData)
+
+  
+
+  var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
+
+  var dropDown = d3.select(".energyTypeStats")
+  var tbody = d3.select(".stats-table-body tr")
+
+  for (var i = 0; i < difEnergy.length; i++) {
+    dropDown
+      .append("option")
+      .attr("value", `${difEnergy[i]}`)
+      .text(difEnergy[i]);
+  }
+
+  var sum = 0;
+
+  almostTableData.forEach(function(item){
+    sum += item.generation_gwh_2017;
+  })
+
+  var allStationsSum = sum.toFixed(2);
+  var allStationsCount = data.length;
+  var allStationsAvg = (allStationsSum / allStationsCount).toFixed(2);
+  
+  tbody.append('td').text(numberWithCommas(allStationsCount));
+  tbody.append("td").text(numberWithCommas(allStationsSum));
+  tbody.append("td").text(numberWithCommas(allStationsAvg));
+
+  dropDown.on("change", () => {
+    tbody.selectAll("td").remove()
+    var value = dropDown.property("value");
+    var dataStats = filter(almostTableData, value);
+    var dataStationsCount = dataStats.length;
+    var sum = 0;
+    dataStats.forEach((item)=> sum += item.generation_gwh_2017);
+    var dataStationsSum = sum.toFixed(2);
+    var dataStationsAvg = (dataStationsSum / dataStationsCount).toFixed(2);
+    if (value == "All") {
+      tbody.append('td').text(numberWithCommas(allStationsCountComma));
+      tbody.append("td").text(numberWithCommas(allStationsSumComma));
+      tbody.append("td").text(numberWithCommas(allStationsAvg));
+    } else {
+      tbody.append("td").text(numberWithCommas(dataStationsCount));
+      tbody.append("td").text(numberWithCommas(dataStationsSum));
+      tbody.append("td").text(numberWithCommas(dataStationsAvg));
+    }
+  })
+
+});
 
 // Map 1
 // Map of geolocations

@@ -44,10 +44,34 @@
 <body>
   <div class="header-container">
     <h1 class="header-title">United States Energy Generation</h1>
-    <div class="header">
+    <div class='header'>
+      <div class="header-image">
+      </div>
     </div>
   <div class="gridContainer">
     <div class="container">
+      <div class="stats-container">
+        <h2> 2017 Statistics </h2> 
+        <table class="table table-bordered stats-table"> 
+          <thead>
+            <tr>
+              <th> Energy Type </th>
+              <th> Quantity</th>
+              <th> Total Production (GWH) </th>
+              <th> Average Production (GWH) </th>
+            </tr>
+          </thead>
+          <tbody class="stats-table-body"> 
+            <tr> 
+              <th class="noDelete"> 
+                <select class="energyTypeStats"> 
+                  <option value="All"> All </option>
+                </select>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="map-container">
         <h2> Location </h2>
         <div class="row justify-content-between">
@@ -214,8 +238,9 @@
         </div>
       </div>
 
-      <div id="table-area" style="padding:5px;margin-bottom:50px">
-        <table id="energy-table" class="display">
+      
+      <div id="table-area" style="padding:5px;margin-bottom:50px;">
+        <table id="energy-table" class="display" style=" width:100%;">
       </div>
     </div>
   </div>
