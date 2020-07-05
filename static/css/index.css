@@ -10,7 +10,7 @@ body {
   
 body,
 html {
-    /* height: 100%; */
+    scroll-behavior: smooth;
 }
 
 
@@ -34,11 +34,6 @@ html {
     box-shadow: 0px 0px 15px rgba(0,0,0,1);
 }
 
-.header-container {
-    height:500px;
-    
-}
-
 .container {
     padding-top: 50px;
     height:100%
@@ -55,10 +50,32 @@ html {
     margin:0
 }
 
+.get-started-div {
+    position:absolute;
+    margin-left:auto;
+    margin-right:auto;
+    left:0;
+    right:0; 
+    text-align:center;
+    z-index: 1;
+    display:block;
+    top: 60%;
+
+}
+
+.get-started-button {
+    height:50px;
+    width:125px;
+    border-radius:5px;
+    text-decoration: none;
+}
+
 .header {
     position:relative;
-    height:700px;
+    height:100vh;
+    
 }
+
 .header-image {
     background-image: url("../../static/images/background-image.jpeg");
     /* background-image: url("../../static/images/turbine.gif"); */
@@ -66,10 +83,11 @@ html {
     /* background-image: url("../../static/images/turbine3.gif"); */
     background-repeat: no-repeat;
     background-size:cover;
-    height:100%;
+    
     width:100%;
-    /* opacity: .5; */
+    opacity: .5;
     position:absolute;
+    height:100vh;
     
     /* position: absolute;
     z-index:2 */
@@ -82,6 +100,7 @@ html {
     border-radius: 5px;
     box-shadow: 0px 0px 10px;
 }
+
 .header-title{
     position:absolute;
     margin-left:auto;
@@ -90,6 +109,11 @@ html {
     right:0; 
     text-align:center;
     z-index: 1;
+    font-size: 6.5rem;
+    font-weight: normal;
+    display:block;
+    top: 45%;
+    
 }
 
 .panel-group {
@@ -136,5 +160,9 @@ html {
 
     .map-container {
         height: 900px;
+    }
+
+    .header-title {
+        top:40%
     }
 }

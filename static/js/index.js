@@ -1,7 +1,7 @@
 const API_KEY =
   "pk.eyJ1IjoiamVyZW15YnJlbnQiLCJhIjoiY2tiaWh0YzF2MGZkazJybThkcWtob2Y3MyJ9.nWks4cNoybDOq9i2jGGywg";
 
-var dataset = "../Assets/Data/clean_USA_power_plant_data.csv";
+var dataset = "../Assets/Data/clean_USA_power_plant_data_states.csv";
 
 var locationStateSelect = d3.select("#location_state_select");
 var locationEnergySelect = d3.select("#location_energy_select");
