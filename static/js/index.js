@@ -94,7 +94,7 @@ d3.csv(dataset).then((data) => {
 });
 
 //////////
-// Data extraction for maps
+// Data extraction for map 1
 d3.csv(dataset).then((data) => {
   var columnNames = [
     "name",
@@ -188,6 +188,80 @@ d3.csv(dataset).then((data) => {
     // Add our marker cluster layer to the map
     markerClusterGroup.addTo(myMap);
   });
+});
+
+//////////
+// Data extraction for map 2
+d3.csv(dataset).then(function (data) {
+  console.log(data);
+  var columnNames = [
+    "name",
+    "primary_fuel",
+    "generation_gwh_2017",
+    "latitude",
+    "longitude",
+
+  ];
+
+  const redux = (array) =>
+    array.map((o) =>
+      columnNames.reduce((acc, curr) => {
+        acc[curr] = o[curr];
+        return acc;
+      }, {})
+    );
+
+  var reducedData = redux(data);
+  // Create a new choropleth layer
+  var choroplethLayer = L.choropleth(reducedData, {
+
+    // Define what  property in the features to use
+    valueProperty: 'generation_gwh_2017',
+
+    // Set color scale
+    scale: ["white", "red"],
+
+    // Number of breaks in step range
+    steps: 10,
+
+    // q for quartile, e for equidistant, k for k-means
+    mode: 'q',
+    // Set style
+    style: {
+      color: '#fff', // border color
+      weight: 2,
+      fillOpacity: 0.8
+    },
+    onEachFeature: function (feature, layer) {
+      // Binding a pop-up to each layer
+      if (feature.properties.generation_gwh_2017) {
+        layer.bindPopup("<h3> Median House Hold Income </h3> <hr>" + feature.properties.generation_gwh_2017)
+      }
+    }
+  }).addTo(myMap2);
+console.log(choroplethLayer)
+  // Set up the legend
+  var legend = L.control({ position: 'bottomright' })
+  legend.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend')
+    var limits = choroplethLayer.options.limits
+    var colors = choroplethLayer.options.colors
+    var labels = []
+    console.log(choroplethLayer)
+    console.log(colors)
+
+    // Add min & max
+    div.innerHTML = '<div class="labels"><div class="min">' + limits[0] + '</div> \
+			<div class="max">' + limits[limits.length - 1] + '</div></div>'
+
+    limits.forEach(function (limit, index) {
+      labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+    })
+
+    div.innerHTML += '<ul>' + labels.join('') + '</ul>'
+    return div
+  }
+  legend.addTo(myMap2)
 });
 
 //////////
@@ -327,7 +401,7 @@ L.tileLayer(
     tileSize: 512,
     maxZoom: 18,
     zoomOffset: -1,
-    id: "mapbox/streets-v11",
+    id: "mapbox/dark-v10",
     accessToken: API_KEY,
   }
 ).addTo(myMap);
@@ -349,7 +423,7 @@ L.tileLayer(
     tileSize: 512,
     maxZoom: 18,
     zoomOffset: -1,
-    id: "mapbox/streets-v11",
+    id: "mapbox/light-v10",
     accessToken: API_KEY,
   }
 ).addTo(myMap2);
