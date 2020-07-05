@@ -56,12 +56,21 @@ html {
 }
 
 .header {
-    background-image: url("../../Assets/Images/background-image.jpeg");
+    position:relative;
+    height:700px;
+}
+.header-image {
+    background-image: url("../../static/images/background-image.jpeg");
+    /* background-image: url("../../static/images/turbine.gif"); */
+    /* background-image: url("../../static/images/turbine2.gif"); */
+    /* background-image: url("../../static/images/turbine3.gif"); */
     background-repeat: no-repeat;
     background-size:cover;
     height:100%;
     width:100%;
-    opacity: .5;
+    /* opacity: .5; */
+    position:absolute;
+    
     /* position: absolute;
     z-index:2 */
 }
@@ -88,6 +97,29 @@ html {
     border-radius: 5px
 }
 
+
+.citation {
+    text-align:right;
+    margin:15px;
+    margin-right: 0px;
+    display:block;
+    font-size:15px;
+  }
+
+.energyTypeStats {
+    border-radius:5px;
+}
+.stats-table {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px;
+
+}
+
+.stats-container {
+    margin-bottom: 50px;
+}
+
 @media screen and (max-width:768px) {
     .panel-group {
         margin-left:0px;
@@ -99,10 +131,10 @@ html {
     }
 
     #table-area {
-        margin-top: 250px
+        margin-top: 50px
     }
 
     .map-container {
-        height: 650px;
+        height: 900px;
     }
 }
