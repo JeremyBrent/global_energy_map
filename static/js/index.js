@@ -142,16 +142,18 @@ d3.csv(dataset).then((data) => {
 
   locationEnergySelect.on("change", () => {
     // markerArray = [];
-    // markerClusterGroup = L.markerClusterGroup();
     var energySelectValue = locationEnergySelect.node().value;
     var filteredData = filterByEnergy(reducedData, energySelectValue);
 
-    // console.log(markerClusterGroup)
-    markerClusterGroup.clearLayers(markerArray);
+    // console.log(markerClusterGroup);
+    // // markerClusterGroup.clearLayers();
+    // console.log(markerClusterGroup);
+    if (markerClusterGroup) {
+      myMap.removeLayers(markerClusterGroup);
+    }
 
     // Check for location property
     if (energySelectValue == "All") {
-      
       for (var i = 0; i < reducedData.length; i++) {
         allLocations = [reducedData[i].latitude, reducedData[i].longitude];
 
@@ -165,7 +167,6 @@ d3.csv(dataset).then((data) => {
       }
       markerClusterGroup.addLayers(markerArray);
     } else {
-      
       // // Loop through data
       for (var i = 0; i < filteredData.length; i++) {
         // Set the data location property to a variable
@@ -282,6 +283,7 @@ d3.csv(dataset).then((data) => {
   tbody.append("td").text(numberWithCommas(allStationsCount));
   tbody.append("td").text(numberWithCommas(allStationsSum));
   tbody.append("td").text(numberWithCommas(allStationsAvg));
+  tbody.append("td").text(100);
 
   dropDown.on("change", () => {
     tbody.selectAll("td").remove();
@@ -292,14 +294,19 @@ d3.csv(dataset).then((data) => {
     dataStats.forEach((item) => (sum += item.generation_gwh_2017));
     var dataStationsSum = sum.toFixed(2);
     var dataStationsAvg = (dataStationsSum / dataStationsCount).toFixed(2);
+    var dataStatsPercent = ((dataStationsSum / allStationsSum) * 100).toFixed(
+      2
+    );
     if (value == "All") {
       tbody.append("td").text(numberWithCommas(allStationsCount));
       tbody.append("td").text(numberWithCommas(allStationsSum));
       tbody.append("td").text(numberWithCommas(allStationsAvg));
+      tbody.append("td").text(100);
     } else {
       tbody.append("td").text(numberWithCommas(dataStationsCount));
       tbody.append("td").text(numberWithCommas(dataStationsSum));
       tbody.append("td").text(numberWithCommas(dataStationsAvg));
+      tbody.append("td").text(dataStatsPercent);
     }
   });
 });
