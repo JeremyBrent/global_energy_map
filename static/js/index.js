@@ -61,6 +61,8 @@ prodYearSelect.on("change", () => {
   console.log(yearSelectValue);
 });
 
+
+
 //////////
 // Data extraction maps filterers
 d3.csv(dataset).then((data) => {
@@ -93,6 +95,8 @@ d3.csv(dataset).then((data) => {
   }
 });
 
+
+var markerClusterGroup = L.markerClusterGroup();
 //////////
 // Data extraction for map 1
 d3.csv(dataset).then((data) => {
@@ -120,13 +124,14 @@ d3.csv(dataset).then((data) => {
     d.commissioning_year = +d.commissioning_year;
   });
 
-  var markerClusterGroup = L.markerClusterGroup();
-
+  var heatArray = [];
   var markerArray = [];
 
   for (var i = 0; i < reducedData.length; i++) {
     allLocations = [reducedData[i].latitude, reducedData[i].longitude];
-
+    // Heat layer
+    heatArray.push(allLocations)
+    // Marker Cluster Group Layer
     var marker = L.marker(allLocations).bindPopup(`
           <p><strong> Name: </strong> ${reducedData[i].name} </p>
           <hr>
@@ -138,19 +143,33 @@ d3.csv(dataset).then((data) => {
 
   markerClusterGroup.addLayers(markerArray);
   // Add our marker cluster layer to the map
-  markerClusterGroup.addTo(myMap);
+  
+
+  var heat = L.heatLayer(heatArray, {
+    radius: 125,
+    blur: 0,
+    max: 1
+  });
+
+
+  var overlayMap = {
+    "Clusters": markerClusterGroup,
+    "Heat": heat
+  };
+
+  L.control.layers(overlayMap).addTo(myMap);
 
   locationEnergySelect.on("change", () => {
     // markerArray = [];
     var energySelectValue = locationEnergySelect.node().value;
     var filteredData = filterByEnergy(reducedData, energySelectValue);
-
+    console.log(energySelectValue)
     // console.log(markerClusterGroup);
     // // markerClusterGroup.clearLayers();
     // console.log(markerClusterGroup);
-    if (markerClusterGroup) {
-      myMap.removeLayers(markerClusterGroup);
-    }
+    // if (markerClusterGroup) {
+    //   myMap.removeLayers(markerClusterGroup);
+    // }
 
     // Check for location property
     if (energySelectValue == "All") {
@@ -186,87 +205,98 @@ d3.csv(dataset).then((data) => {
       markerClusterGroup.addLayers(markerArray);
     }
     // Add our marker cluster layer to the map
-    markerClusterGroup.addTo(myMap);
+    var overlayMap = {
+      "Clusters": markerClusterGroup,
+      "Heat": heat
+    };
+    L.control.layers(overlayMap).addTo(myMap);
   });
 });
 
-//////////
-// Data extraction for map 2
-d3.csv(dataset).then(function (data) {
-  console.log(data);
-  var columnNames = [
-    "name",
-    "primary_fuel",
-    "generation_gwh_2017",
-    "latitude",
-    "longitude",
+// //////////
+// // Data extraction for map 2
+// d3.csv(dataset).then(function (data) {
+//   console.log(data);
+//   var columnNames = [
+//     "name",
+//     "primary_fuel",
+//     "generation_gwh_2017",
+//     "latitude",
+//     "longitude",
 
-  ];
+//   ];
 
-  const redux = (array) =>
-    array.map((o) =>
-      columnNames.reduce((acc, curr) => {
-        acc[curr] = o[curr];
-        return acc;
-      }, {})
-    );
+//   const redux = (array) =>
+//     array.map((o) =>
+//       columnNames.reduce((acc, curr) => {
+//         acc[curr] = o[curr];
+//         return acc;
+//       }, {})
+//     );
 
-  var reducedData = redux(data);
-  // Create a new choropleth layer
-  var choroplethLayer = L.choropleth(reducedData, {
+//   var reducedData = redux(data);
+//   // Create a new choropleth layer
+//   var choroplethLayer = L.choropleth(reducedData.toGeoJson(), {
 
-    // Define what  property in the features to use
-    valueProperty: 'generation_gwh_2017',
+//     // Define what  property in the features to use
+//     valueProperty: 'generation_gwh_2017',
 
-    // Set color scale
-    scale: ["white", "red"],
+//     // Set color scale
+//     scale: ["white", "red"],
 
-    // Number of breaks in step range
-    steps: 10,
+//     // Number of breaks in step range
+//     steps: 10,
 
-    // q for quartile, e for equidistant, k for k-means
-    mode: 'q',
-    // Set style
-    style: {
-      color: '#fff', // border color
-      weight: 2,
-      fillOpacity: 0.8
-    },
-    onEachFeature: function (feature, layer) {
-      // Binding a pop-up to each layer
-      if (feature.properties.generation_gwh_2017) {
-        layer.bindPopup("<h3> Median House Hold Income </h3> <hr>" + feature.properties.generation_gwh_2017)
-      }
-    }
-  }).addTo(myMap2);
-console.log(choroplethLayer)
-  // Set up the legend
-  var legend = L.control({ position: 'bottomright' })
-  legend.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'info legend')
-    var limits = choroplethLayer.options.limits
-    var colors = choroplethLayer.options.colors
-    var labels = []
-    console.log(choroplethLayer)
-    console.log(colors)
+//     // q for quartile, e for equidistant, k for k-means
+//     mode: 'q',
+//     // Set style
+//     style: {
+//       color: '#fff', // border color
+//       weight: 2,
+//       fillOpacity: 0.8
+//     },
+//     onEachFeature: function (feature, layer) {
+//       // Binding a pop-up to each layer
+//       if (feature.properties.generation_gwh_2017) {
+//         layer.bindPopup("<h3> Median House Hold Income </h3> <hr>" + feature.properties.generation_gwh_2017)
+//       }
+//     }
+//   }).addTo(myMap2);
+// console.log(choroplethLayer)
+//   // Set up the legend
+//   var legend = L.control({ position: 'bottomright' })
+//   legend.onAdd = function (map) {
+//     var div = L.DomUtil.create('div', 'info legend')
+//     var limits = choroplethLayer.options.limits
+//     var colors = choroplethLayer.options.colors
+//     var labels = []
+//     console.log(choroplethLayer)
+//     console.log(colors)
 
-    // Add min & max
-    div.innerHTML = '<div class="labels"><div class="min">' + limits[0] + '</div> \
-			<div class="max">' + limits[limits.length - 1] + '</div></div>'
+//     // Add min & max
+//     div.innerHTML = '<div class="labels"><div class="min">' + limits[0] + '</div> \
+// 			<div class="max">' + limits[limits.length - 1] + '</div></div>'
 
-    limits.forEach(function (limit, index) {
-      labels.push('<li style="background-color: ' + colors[index] + '"></li>')
-    })
+//     limits.forEach(function (limit, index) {
+//       labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+//     })
 
-    div.innerHTML += '<ul>' + labels.join('') + '</ul>'
-    return div
-  }
-  legend.addTo(myMap2)
-});
+//     div.innerHTML += '<ul>' + labels.join('') + '</ul>'
+//     return div
+//   }
+//   legend.addTo(myMap2)
+// });
 
 //////////
 // Data extraction to build the data table
 d3.csv(dataset).then((data) => {
+  data.forEach((d) => {
+    d.latitude = (+d.latitude).toFixed(4);
+    d.longitude = (+d.longitude).toFixed(4);
+    d.commissioning_year = +d.commissioning_year;
+    d.generation_gwh_2017 = numberWithCommas((+d.generation_gwh_2017).toFixed(2));
+  });
+
   var columnNames = [
     "name",
     "state",
@@ -353,11 +383,12 @@ d3.csv(dataset).then((data) => {
   var allStationsSum = sum.toFixed(2);
   var allStationsCount = data.length;
   var allStationsAvg = (allStationsSum / allStationsCount).toFixed(2);
+  var percentAllStations = (allStationsSum/allStationsSum * 100)
 
   tbody.append("td").text(numberWithCommas(allStationsCount));
   tbody.append("td").text(numberWithCommas(allStationsSum));
   tbody.append("td").text(numberWithCommas(allStationsAvg));
-  tbody.append("td").text(100);
+  tbody.append("td").text(percentAllStations);
 
   dropDown.on("change", () => {
     tbody.selectAll("td").remove();
@@ -368,14 +399,12 @@ d3.csv(dataset).then((data) => {
     dataStats.forEach((item) => (sum += item.generation_gwh_2017));
     var dataStationsSum = sum.toFixed(2);
     var dataStationsAvg = (dataStationsSum / dataStationsCount).toFixed(2);
-    var dataStatsPercent = ((dataStationsSum / allStationsSum) * 100).toFixed(
-      2
-    );
+    var dataStatsPercent = ((dataStationsSum / allStationsSum) * 100).toFixed(2);
     if (value == "All") {
       tbody.append("td").text(numberWithCommas(allStationsCount));
       tbody.append("td").text(numberWithCommas(allStationsSum));
       tbody.append("td").text(numberWithCommas(allStationsAvg));
-      tbody.append("td").text(100);
+      tbody.append("td").text(percentAllStations);
     } else {
       tbody.append("td").text(numberWithCommas(dataStationsCount));
       tbody.append("td").text(numberWithCommas(dataStationsSum));
@@ -390,6 +419,8 @@ d3.csv(dataset).then((data) => {
 var myMap = L.map("map", {
   center: [39.8283, -98.5795],
   zoom: 4,
+  maxZoom:18,
+  layers: [markerClusterGroup]
 });
 
 // Adding tile layer to the map
