@@ -146,8 +146,8 @@ d3.csv(dataset).then((data) => {
   
 
   var heat = L.heatLayer(heatArray, {
-    radius: 125,
-    blur: 0,
+    radius: 20,
+    blur: 35,
     max: 1
   });
 
@@ -418,7 +418,7 @@ d3.csv(dataset).then((data) => {
 // Map of geolocations
 var myMap = L.map("map", {
   center: [39.8283, -98.5795],
-  zoom: 4,
+  zoom: 2,
   maxZoom:18,
   layers: [markerClusterGroup]
 });
