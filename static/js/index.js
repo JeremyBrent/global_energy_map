@@ -15,13 +15,15 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+
+var markerClusterGroup = L.markerClusterGroup();
+
 /////
 // Function to initialize page
 /////
 function init() {
-  var markerClusterGroup = L.markerClusterGroup();
-  d3.json("/api/v1.0/all_energy").then((data) => {
-
+  
+  d3.json("/all_energy").then((data) => {
     console.log(data);
     // Preparing data for the marker cluster map 1
     var markerArray = [];
@@ -42,16 +44,15 @@ function init() {
 
     // Preparing data for the data table
     var columnNames = [
-          "name",
-          "state",
-          "commissioning_year",
-          "primary_fuel",
-          "latitude",
-          "longitude",
-          "generation_gwh_2017",
-        ];
-      
-      
+      "name",
+      "state",
+      "commissioning_year",
+      "primary_fuel",
+      "latitude",
+      "longitude",
+      "generation_gwh_2017",
+    ];
+
     const redux = (array) =>
       array.map((o) =>
         columnNames.reduce((acc, curr) => {
@@ -59,7 +60,7 @@ function init() {
           return acc;
         }, {})
       );
-  
+
     var almostTableData = redux(data);
 
     var tableData = almostTableData.map(Object.values);
@@ -84,10 +85,91 @@ function init() {
 }
 
 /////
+// Function to filter map
+/////
+function mapFilter() {
+  var selectedFilters = {};
+  var localStateSelectValue = locationStateSelect.property("value");
+  var localEnergySelectValue = locationEnergySelect.property("value");
+  var localYearSelectValue = locationYearSelect.property("value");
+
+  if (localStateSelectValue) {
+    selectedFilters["state"] = localStateSelectValue;
+    console.log("date Not empty");
+  }
+  if (localEnergySelectValue) {
+    selectedFilters["primary_fuel"] = localEnergySelectValue;
+    console.log("energy Not empty");
+  }
+  if (localYearSelectValue) {
+    selectedFilters["commissioning_year"] = localYearSelectValue;
+    console.log("year Not empty");
+  }
+
+  return selectedFilters;
+}
+
+
+function filterData() {
+  var selectedFilters = mapFilter();
+
+  state_name = selectedFilters["state"];
+  energy = selectedFilters["primary_fuel"];
+  year = selectedFilters["commissioning_year"];
+
+  markerClusterGroup.clearLayers();
+  myMap.removeLayer(markerClusterGroup);
+  
+  d3.json(`/map_filter/${state_name}/${energy}/${year}`).then((data) => {
+    console.log(data);
+    
+    var markerArray = [];
+    for (var i = 0; i < data.length; i++) {
+      allLocations = [data[i].latitude, data[i].longitude];
+
+      marker = L.marker(allLocations).bindPopup(`
+              <p><strong> Name: </strong> ${data[i].name} </p>
+              <hr>
+              <p><strong> Commission Year: </strong> ${data[i].commissioning_year} </p>
+              <p><strong> Primary Fuel Type: </strong> ${data[i].primary_fuel} </p>
+            `);
+      markerArray.push(marker);
+    }
+    markerClusterGroup.addLayers(markerArray);
+
+    markerClusterGroup.addTo(myMap);
+
+
+
+    // // console.log(filteredData);
+    // Object.entries(selectedFilters).forEach(([key, value]) => {
+    //   // console.log(something);
+
+    //   filteredData = data.filter(
+    //     (record) => record[`${key}`] === value
+    //   );
+    //   console.log(filteredData);
+    // });
+
+    // filteredData.forEach((powerPlant) => {
+    //   // console.log(ufoRecord)
+    //   var powerPlantFilteredData = []
+    //   Object.entries(powerPlant).forEach(([key, value]) => {
+    //     // console.log(key, value);
+    //     var powerPlantFilteredDataObject = {}
+    //     powerPlantFilteredDataObject[`${key}`] = value;
+    //     powerPlantFilteredData.push(powerPlantFilteredDataObject)
+    //   });
+    //   // console.log(powerPlantFilteredData)
+    // });
+  });
+}
+
+/////
 // Function to initialize stats table
 /////
 function initStat() {
-  d3.json("/api/v1.0/all_energy").then((data) => {
+  d3.json("/all_energy").then((data) => {
     console.log(data);
 
     var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
@@ -130,7 +212,7 @@ init();
 function onChangeStatsTable(fuel_type) {
   var tbody = d3.select(".stats-table-body tr");
 
-  d3.json(`/api/v1.0/filter_stats_table/${fuel_type}`).then((data) => {
+  d3.json(`/filter_stats_table/${fuel_type}`).then((data) => {
     console.log(data);
     tbody.selectAll("td").remove();
 
@@ -138,12 +220,58 @@ function onChangeStatsTable(fuel_type) {
       initStat();
     } else {
       tbody.append("td").text(numberWithCommas(data.num_power_plants));
-      tbody.append("td").text(numberWithCommas((data.total_prod.toFixed(2))));
-      tbody.append("td").text(numberWithCommas((data.avg_prod.toFixed(2))));
-      tbody.append("td").text(numberWithCommas((data.percent_prod.toFixed(2))));
+      tbody.append("td").text(numberWithCommas(data.total_prod.toFixed(2)));
+      tbody.append("td").text(numberWithCommas(data.avg_prod.toFixed(2)));
+      tbody.append("td").text(numberWithCommas(data.percent_prod.toFixed(2)));
     }
   });
 }
+
+/////////////
+// Data extraction maps filterers drop down values
+////////////
+d3.json("/all_energy").then((data) => {
+  var difYears = [
+    ...new Set(data.map((x) => x.commissioning_year).sort((a, b) => b - a)),
+  ];
+
+  var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
+
+  var difStates = [...new Set(data.map((x) => x.state).sort())];
+
+  for (var i = 0; i < difStates.length; i++) {
+    locationStateSelect
+      .append("option")
+      .attr("value", `${difStates[i]}`)
+      .text(difStates[i]);
+    prodStateSelect
+      .append("option")
+      .attr("value", `${difStates[i]}`)
+      .text(difStates[i]);
+  }
+
+  for (var i = 0; i < difYears.length; i++) {
+    locationYearSelect
+      .append("option")
+      .attr("value", `${difYears[i]}`)
+      .text(difYears[i]);
+    prodYearSelect
+      .append("option")
+      .attr("value", `${difYears[i]}`)
+      .text(difYears[i]);
+  }
+
+  for (var i = 0; i < difEnergy.length; i++) {
+    locationEnergySelect
+      .append("option")
+      .attr("value", `${difEnergy[i]}`)
+      .text(difEnergy[i]);
+    prodEnergySelect
+      .append("option")
+      .attr("value", `${difEnergy[i]}`)
+      .text(difEnergy[i]);
+  }
+});
 
 // // function dropDownSelect(dropDown) {
 // //   dropDown.on("change", () => {
@@ -195,61 +323,22 @@ function onChangeStatsTable(fuel_type) {
 
 // //   energySelectValue = locationEnergySelect.node().value;
 
-// //   d3.json(`/api/v1.0/input_testing/${energySelectValue}`, () =>{
+// //   d3.json(`/input_testing/${energySelectValue}`, () =>{
 
 // //   })
 // // });
 
 // // function renderClusters (state, energy, year) {
-// //   d3.json(`/api/v1.0/input_testing/${energySelectValue}`, () =>{
+// //   d3.json(`/input_testing/${energySelectValue}`, () =>{
 
 // //   })
 // // }
 
-// //////////
-// Data extraction maps filterers
-d3.json("/api/v1.0/all_energy").then((data) => {
-  var difYears = [
-    ...new Set(data.map((x) => x.commissioning_year).sort((a, b) => b - a)),
-  ];
-
-  var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
-
-  for (var i = 0; i < difYears.length; i++) {
-    locationYearSelect
-      .append("option")
-      .attr("value", `${difYears[i]}`)
-      .text(difYears[i]);
-    prodYearSelect
-      .append("option")
-      .attr("value", `${difYears[i]}`)
-      .text(difYears[i]);
-  }
-
-  for (var i = 0; i < difEnergy.length; i++) {
-    locationEnergySelect
-      .append("option")
-      .attr("value", `${difEnergy[i]}`)
-      .text(difEnergy[i]);
-    prodEnergySelect
-      .append("option")
-      .attr("value", `${difEnergy[i]}`)
-      .text(difEnergy[i]);
-  }
-});
-
-
-
-function mapFilterer(state) {
-  d3.json(`/api/v1.0/input_testing/${state}`).then((data) => {
-    
-  })
-}
 //////////
 // Data extraction for map 1
 
 // locationEnergySelect.on("change", () => {
-// d3.json(`/api/v1.0/energy_filter/${primary_fuel}`).then((data) => {
+// d3.json(`/energy_filter/${primary_fuel}`).then((data) => {
 //   var columnNames = [
 //     "name",
 //     "primary_fuel",
