@@ -25,15 +25,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def welcome():
-    """List all available api routes."""
-    return (
-        f"Available Routes:<br/>"
-        f"/api/v1.0/testing<br/>"
-        f"/api/v1.0/input_testing/insert_fuel_type_here</br>"
-        f"/api/v1.0/input_testing/insert_commissioning_year_here"
-    )
-
-
+    
+    return render_template('index.html')
+        
 @app.route("/api/v1.0/testing")
 def power_plant_filter():
     # Create our session (link) from Python to the DB
@@ -68,19 +62,70 @@ def power_plant_filter():
     return jsonify(all_rows)
     # return render_template("index.html", rows=all_rows)
 
+@app.route("/api/v1.0/all_energy")
+def return_all_energy():
+    session = Session(engine)
+    test_filter = session.query(power_plants_data.name, power_plants_data.state, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.primary_fuel, power_plants_data.commissioning_year, power_plants_data.generation_gwh_2017).all()
+    
+    session.close()
 
-@app.route("/api/v1.0/input_testing/<fuel_type>")
+    all_rows = []
+    for name, state, owner, latitude, longitude, primary_fuel, commissioning_year, generation_gwh_2017 in test_filter:
+        test_dict = {}
+        test_dict["name"] = name
+        test_dict["state"] = state
+        test_dict["commissioning_year"] = commissioning_year
+        test_dict["primary_fuel"] = primary_fuel
+        test_dict["latitude"] = float(latitude)
+        test_dict["longitude"] = float(longitude)
+        test_dict["generation_gwh_2017"] = float(generation_gwh_2017)
+        test_dict["owner"] = owner
+        
+        all_rows.append(test_dict)
+
+    return jsonify(all_rows)
+
+@app.route("/api/v1.0/filter_stats_table/<fuel_type>")
+def stats_filter(fuel_type):
+    session = Session(engine)
+
+    all_gwh_produced = []
+    gwh_produced_all = session.query(power_plants_data.generation_gwh_2017).all()
+    all_gwh_produced.append(gwh_produced_all)
+    all_gwh_sum = np.sum(all_gwh_produced)
+
+    avg_gwh_list = []
+    gwh_produced = session.query(power_plants_data.generation_gwh_2017).filter_by(primary_fuel= fuel_type).all()
+    for power_plant in gwh_produced:
+        avg_gwh_list.append(power_plant)
+    avg_gwh = np.mean(avg_gwh_list)
+
+    session.close()
+
+    number_of_power_plants = len(avg_gwh_list)
+
+    power_gwh_list = []
+    power_gwh_list.append(gwh_produced)
+    power_gwh_sum = np.sum(power_gwh_list)
+
+    percent_produced = ((power_gwh_sum / all_gwh_sum) * 100)
+
+    return_object = {"num_power_plants":number_of_power_plants,"total_prod":float(power_gwh_sum), "avg_prod":float(avg_gwh), "percent_prod":float(percent_produced)}
+
+    return return_object
+
+@app.route("/api/v1.0/energy_filter/<fuel_type>")
 def filter_function(fuel_type):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
     # fuel_type_input = input('Enter Fuel Type: ')
-    test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(primary_fuel= fuel_type).all()
+    test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year, power_plants_data.generation_gwh_2017).filter_by(primary_fuel= fuel_type).all()
     
-    session.close()
+    
     
     all_rows_2 = []
-    for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in test_filter:
+    for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year, generation_gwh_2017 in test_filter:
         test_dict = {}
         test_dict["name"] = name
         test_dict["owner"] = owner
@@ -89,41 +134,45 @@ def filter_function(fuel_type):
         test_dict["capacity_mw"] = float(capacity_mw)
         test_dict["primary_fuel"] = primary_fuel
         test_dict["commissioning_year"] = commissioning_year
+        test_dict["generation_gwh_2017"] = float(generation_gwh_2017)
         all_rows_2.append(test_dict)
 
     print(all_rows_2)
 
-    avg_gwh_list = []
-    gwh_produced = session.query(power_plants_data.generation_gwh_2017).filter_by(primary_fuel= fuel_type).all()
-    avg_gwh_list.append(gwh_produced)
-    avg_gwh = np.mean(avg_gwh_list)
+    
 
     print("---------------------------------------------------")
     print(f'Average GWH Produced from {fuel_type}: {avg_gwh}')
     # unique_countries = list(np.ravel(test_filter))
 
-    total_gwh_list = []
-    total_gwh_list.append(gwh_produced)
-    total_gwh = np.sum(total_gwh_list)
+    
     print("---------------------------------------------------")
     print(f'Total GWH Produced from {fuel_type}: {total_gwh}')    
 
+    session.close()
     # return jsonify(all_rows_2)
     return (
-        f'{jsonify}({all_rows_2})' '<br/>'
-        f'The Average GWH produced by {fuel_type}: {avg_gwh}' '<br/>'
-        f'Total GWH Produced from {fuel_type}: {total_gwh}'
-        )
+        jsonify(all_rows_2)
+        # f'The Average GWH produced by {fuel_type}: {avg_gwh}' '<br/>'
+        # f'Total GWH Produced from {fuel_type}: {total_gwh}'
+         )
 
-@app.route("/api/v1.0/input_testing/<string:year_input>")
+@app.route("/api/v1.0/year_filter/<year_input>")
 def filter_function2(year_input):
+
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
+
     # year_input is a string
     # year_input = input('Enter Year: ')
-    test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(commissioning_year = year_input).all()
-    
+
+    test_filter = session.query(power_plants_data.name, 
+        power_plants_data.owner, power_plants_data.latitude, \
+        power_plants_data.longitude, power_plants_data.capacity_mw, \
+        power_plants_data.primary_fuel, power_plants_data.commissioning_year).\
+        filter_by(commissioning_year = year_input).all()
+        
     session.close()
     
     all_rows_3 = []
@@ -137,37 +186,37 @@ def filter_function2(year_input):
         test_dict["primary_fuel"] = primary_fuel
         test_dict["commissioning_year"] = commissioning_year
         all_rows_3.append(test_dict)
-    unique_countries = list(np.ravel(test_filter))
+    # unique_countries = list(np.ravel(test_filter))
     print(all_rows_3)
 
     return jsonify(all_rows_3)
 
 
-# @app.route("/api/v1.0/input_testing/<state>")
-# def filter_function(state):
-#     # Create our session (link) from Python to the DB
-#     session = Session(engine)
+@app.route("/api/v1.0/input_testing/<state>")
+def state_filter(state):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
 
-#     # state_input = input('Enter State: ')
-#     test_filter = session.query(power_plants_data.name, power_plants_data.owner, power_plants_data.state, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.capacity_mw, power_plants_data.primary_fuel, power_plants_data.commissioning_year).filter_by(state= state).all()
+    # state_input = input('Enter State: ')
+    test_filter = session.query(power_plants_data.name, power_plants_data.state, power_plants_data.latitude, power_plants_data.longitude, power_plants_data.primary_fuel, power_plants_data.commissioning_year, power_plants_data.generation_gwh_2017).filter_by(state= state).all()
     
-#     session.close()
+    session.close()
     
-#     all_rows_3 = []
-#     for name, owner, latitude, longitude, capacity_mw, primary_fuel, commissioning_year in test_filter:
-#         test_dict = {}
-#         test_dict["name"] = name
-#         test_dict["owner"] = owner
-#         test_dict["latitude"] = float(latitude)
-#         test_dict["longtitude"] = float(longitude)
-#         test_dict["capacity_mw"] = float(capacity_mw)
-#         test_dict["primary_fuel"] = primary_fuel
-#         test_dict["commissioning_year"] = commissioning_year
-#         all_rows_3.append(test_dict)
-#     unique_countries = list(np.ravel(test_filter))
-#     print(all_rows_3)
+    all_rows_3 = []
+    for name, state, latitude, longitude, primary_fuel, commissioning_year, generation_gwh_2017 in test_filter:
+        test_dict = {}
+        test_dict["name"] = name
+        test_dict["state"] = state
+        test_dict["latitude"] = float(latitude)
+        test_dict["longtitude"] = float(longitude)
+        test_dict["primary_fuel"] = primary_fuel
+        test_dict["commissioning_year"] = commissioning_year
+        test_dict["generation_gwh_2017"] = float(generation_gwh_2017)
+        all_rows_3.append(test_dict)
+    unique_countries = list(np.ravel(test_filter))
+    print(all_rows_3)
 
-#     return jsonify(all_rows_3)
+    return jsonify(all_rows_3)
 
 if __name__ == '__main__':
     app.run(debug=True)

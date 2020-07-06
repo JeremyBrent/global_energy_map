@@ -40,8 +40,8 @@
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-   <!-- Leaflet-Choropleth JavaScript -->
-   <script type="text/javascript" src="static/js/choropleth.js"></script>
+   <!-- Leaflet-Choropleth JavaScript
+   <script type="text/javascript" src="static/js/choropleth.js"></script> -->
 
    <script src = "../static/js/Leaflet-heat.js"></script>
 
@@ -75,7 +75,7 @@
           <tbody class="stats-table-body"> 
             <tr> 
               <th class="noDelete"> 
-                <select class="energyTypeStats"> 
+                <select class="energyTypeStats" onchange="onChangeStatsTable(this.value)"> 
                   <option value="All"> All </option>
                 </select>
               </th>
@@ -98,7 +98,7 @@
                 </div>
                 <div id="state_div" class="panel-collapse collapse in">
                   <div class="panel-body">
-                    <select id="location_state_select" name="state_select" class="form-control">
+                    <select id="location_state_select" name="state_select" class="form-control" onchange="mapFilterer(this.value)">
                       <option value="All">All</option>
                       <option value="Alabama">Alabama</option>
                       <option value="Alaska">Alaska</option>
