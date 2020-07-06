@@ -89,24 +89,19 @@ def return_all_energy():
 def stats_filter(fuel_type):
     session = Session(engine)
 
-    all_gwh_produced = []
     gwh_produced_all = session.query(power_plants_data.generation_gwh_2017).all()
-    all_gwh_produced.append(gwh_produced_all)
-    all_gwh_sum = np.sum(all_gwh_produced)
+    
+    all_gwh_sum = np.sum(gwh_produced_all)
 
-    avg_gwh_list = []
     gwh_produced = session.query(power_plants_data.generation_gwh_2017).filter_by(primary_fuel= fuel_type).all()
-    for power_plant in gwh_produced:
-        avg_gwh_list.append(power_plant)
-    avg_gwh = np.mean(avg_gwh_list)
+   
+    avg_gwh = np.mean(gwh_produced)
 
     session.close()
 
-    number_of_power_plants = len(avg_gwh_list)
+    number_of_power_plants = len(gwh_produced)
 
-    power_gwh_list = []
-    power_gwh_list.append(gwh_produced)
-    power_gwh_sum = np.sum(power_gwh_list)
+    power_gwh_sum = np.sum(gwh_produced)
 
     percent_produced = ((power_gwh_sum / all_gwh_sum) * 100)
 

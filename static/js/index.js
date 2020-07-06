@@ -15,11 +15,15 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+/////
+// Function to initialize page
+/////
 function init() {
   var markerClusterGroup = L.markerClusterGroup();
   d3.json("/api/v1.0/all_energy").then((data) => {
 
     console.log(data);
+    // Preparing data for the marker cluster map 1
     var markerArray = [];
     for (var i = 0; i < data.length; i++) {
       allLocations = [data[i].latitude, data[i].longitude];
@@ -36,6 +40,7 @@ function init() {
 
     markerClusterGroup.addTo(myMap);
 
+    // Preparing data for the data table
     var columnNames = [
           "name",
           "state",
@@ -46,7 +51,7 @@ function init() {
           "generation_gwh_2017",
         ];
       
-      // Function to reduce data object to specific properties
+      
     const redux = (array) =>
       array.map((o) =>
         columnNames.reduce((acc, curr) => {
@@ -78,6 +83,9 @@ function init() {
   initStat();
 }
 
+/////
+// Function to initialize stats table
+/////
 function initStat() {
   d3.json("/api/v1.0/all_energy").then((data) => {
     console.log(data);
@@ -116,6 +124,9 @@ function initStat() {
 
 init();
 
+/////
+// Function to create interactive Stats Table
+/////
 function onChangeStatsTable(fuel_type) {
   var tbody = d3.select(".stats-table-body tr");
 
@@ -126,10 +137,10 @@ function onChangeStatsTable(fuel_type) {
     if (fuel_type == "All") {
       initStat();
     } else {
-      tbody.append("td").text(data.num_power_plants);
-      tbody.append("td").text(data.total_prod.toFixed(2));
-      tbody.append("td").text(data.avg_prod.toFixed(2));
-      tbody.append("td").text(data.percent_prod.toFixed(2));
+      tbody.append("td").text(numberWithCommas(data.num_power_plants));
+      tbody.append("td").text(numberWithCommas((data.total_prod.toFixed(2))));
+      tbody.append("td").text(numberWithCommas((data.avg_prod.toFixed(2))));
+      tbody.append("td").text(numberWithCommas((data.percent_prod.toFixed(2))));
     }
   });
 }
