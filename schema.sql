@@ -19,6 +19,7 @@ CREATE TABLE power_plants (
     geolocation_source varchar NOT NULL,
     wepp_id varchar NOT NULL,
     year_of_capacity_data varchar NOT NULL,
-    generation_gwh_2017 NUMERIC NOT NULL
+    generation_gwh_2017 NUMERIC NOT NULL,
+    state varchar NOT NULL
 );
 
