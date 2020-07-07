@@ -1,18 +1,8 @@
-body {
+body, html {
     padding: 0;
     margin: 0;
-    /* position:fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0; */
-  }
-  
-body,
-html {
     scroll-behavior: smooth;
-}
-
+  }
 
 #map {
     height: 500px;
@@ -24,11 +14,11 @@ html {
     box-shadow: 0px 0px 15px rgba(0,0,0,1);
 }
 
-#map2 {
+#map_2 {
     height: 500px;
     width:100%;
     border-radius: 5px;
-    position: absolute;
+    position: static;
     z-index: 0;
     margin-right: 50px;
     box-shadow: 0px 0px 15px rgba(0,0,0,1);
@@ -44,7 +34,9 @@ html {
 
 .container {
     padding-top: 50px;
-    height:100%
+    height:auto;
+    width:auto;
+    max-width: 1200px;
 }
 
 .gridContainer {
@@ -55,7 +47,7 @@ html {
 .map-container {
     height: 600px;
     width:100%;
-    margin:0
+    margin:0;
 }
 
 .get-started-div {
@@ -130,13 +122,28 @@ html {
 }
 
 
-.citation {
-    text-align:right;
-    margin:15px;
-    margin-right: 0px;
-    display:block;
-    font-size:15px;
-  }
+
+.footer{
+    height:100px;
+    width:100%;
+    position:relative;
+}
+
+.authors  {
+    text-align: center;
+    margin-top:40px;
+
+}
+
+.year {
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.citation{
+    text-align: center;
+    margin-bottom:40px;
+}
 
 .energyTypeStats {
     border-radius:5px;
