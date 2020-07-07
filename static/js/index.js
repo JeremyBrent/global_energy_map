@@ -1,3 +1,6 @@
+
+init();
+
 const API_KEY =
   "pk.eyJ1IjoiamVyZW15YnJlbnQiLCJhIjoiY2tiaWh0YzF2MGZkazJybThkcWtob2Y3MyJ9.nWks4cNoybDOq9i2jGGywg";
 
@@ -15,14 +18,12 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-
 var markerClusterGroup = L.markerClusterGroup();
 
 /////
-// Function to initialize page
+// Function to initialize map 1
 /////
-function init() {
-  
+function initMap() {
   d3.json("/all_energy").then((data) => {
     console.log(data);
     // Preparing data for the marker cluster map 1
@@ -41,8 +42,95 @@ function init() {
     markerClusterGroup.addLayers(markerArray);
 
     markerClusterGroup.addTo(myMap);
+  });
+}
 
-    // Preparing data for the data table
+/////
+// Function to initialize map 2
+/////
+
+
+
+
+d3.json("/all_energy").then((data) => {
+var heatArray = [];
+
+
+  for (var i = 0; i < data.length; i++) {
+    allLocations = [data[i].latitude, data[i].longitude, (data[i].generation_gwh_2017 / 100)];
+    // Heat layer
+    heatArray.push(allLocations)
+  }
+  var heat = L.heatLayer(heatArray, {
+    max: .2,
+    radius:25,
+    // gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}
+  }).addTo(myMap2);
+})
+
+// Create a new choropleth layer
+// d3.json("/all_energy").then((data) => {
+//   var data = data.toGeoJson()
+//   var choroplethLayer = L.choropleth(data, {
+
+//     // Define what  property in the features to use
+//     valueProperty: 'generation_gwh_2017',
+
+//     // Set color scale
+//     scale: ["white", "red"],
+
+//     // Number of breaks in step range
+//     steps: 10,
+
+//     // q for quartile, e for equidistant, k for k-means
+//     mode: 'q',
+//     // Set style
+//     style: {
+//       color: '#fff', // border color
+//       weight: 2,
+//       fillOpacity: 0.8
+//     },
+//     onEachFeature: function (feature, layer) {
+//       // Binding a pop-up to each layer
+//       if (feature.properties.generation_gwh_2017) {
+//         layer.bindPopup("<h3> Median House Hold Income </h3> <hr>" + feature.properties.generation_gwh_2017)
+//       }
+//     }
+//   }).addTo(myMap2);
+
+//   console.log(choroplethLayer)
+
+//   // Set up the legend
+//   var legend = L.control({ position: 'bottomright' })
+//   legend.onAdd = function (map) {
+//     var div = L.DomUtil.create('div', 'info legend')
+//     var limits = choroplethLayer.options.limits
+//     var colors = choroplethLayer.options.colors
+//     var labels = []
+//     console.log(choroplethLayer)
+//     console.log(colors)
+
+//     // Add min & max
+//     div.innerHTML = '<div class="labels"><div class="min">' + limits[0] + '</div> \
+// 			<div class="max">' + limits[limits.length - 1] + '</div></div>'
+
+//     limits.forEach(function (limit, index) {
+//       labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+//     })
+
+//     div.innerHTML += '<ul>' + labels.join('') + '</ul>'
+//     return div
+//   }
+//   legend.addTo(myMap2)
+// })
+
+
+
+/////
+// Function to initialize table
+/////
+function initTable() {
+  d3.json("/all_energy").then((data) => {
     var columnNames = [
       "name",
       "state",
@@ -79,91 +167,9 @@ function init() {
         ],
       });
     });
-  });
-
-  initStat();
+  })
 }
 
-/////
-// Function to filter map
-/////
-function mapFilter() {
-  var selectedFilters = {};
-  var localStateSelectValue = locationStateSelect.property("value");
-  var localEnergySelectValue = locationEnergySelect.property("value");
-  var localYearSelectValue = locationYearSelect.property("value");
-
-  if (localStateSelectValue) {
-    selectedFilters["state"] = localStateSelectValue;
-    console.log("date Not empty");
-  }
-  if (localEnergySelectValue) {
-    selectedFilters["primary_fuel"] = localEnergySelectValue;
-    console.log("energy Not empty");
-  }
-  if (localYearSelectValue) {
-    selectedFilters["commissioning_year"] = localYearSelectValue;
-    console.log("year Not empty");
-  }
-
-  return selectedFilters;
-}
-
-
-function filterData() {
-  var selectedFilters = mapFilter();
-
-  state_name = selectedFilters["state"];
-  energy = selectedFilters["primary_fuel"];
-  year = selectedFilters["commissioning_year"];
-
-  markerClusterGroup.clearLayers();
-  myMap.removeLayer(markerClusterGroup);
-  
-  d3.json(`/map_filter/${state_name}/${energy}/${year}`).then((data) => {
-    console.log(data);
-    
-    var markerArray = [];
-    for (var i = 0; i < data.length; i++) {
-      allLocations = [data[i].latitude, data[i].longitude];
-
-      marker = L.marker(allLocations).bindPopup(`
-              <p><strong> Name: </strong> ${data[i].name} </p>
-              <hr>
-              <p><strong> Commission Year: </strong> ${data[i].commissioning_year} </p>
-              <p><strong> Primary Fuel Type: </strong> ${data[i].primary_fuel} </p>
-            `);
-      markerArray.push(marker);
-    }
-    markerClusterGroup.addLayers(markerArray);
-
-    markerClusterGroup.addTo(myMap);
-
-
-
-    // // console.log(filteredData);
-    // Object.entries(selectedFilters).forEach(([key, value]) => {
-    //   // console.log(something);
-
-    //   filteredData = data.filter(
-    //     (record) => record[`${key}`] === value
-    //   );
-    //   console.log(filteredData);
-    // });
-
-    // filteredData.forEach((powerPlant) => {
-    //   // console.log(ufoRecord)
-    //   var powerPlantFilteredData = []
-    //   Object.entries(powerPlant).forEach(([key, value]) => {
-    //     // console.log(key, value);
-    //     var powerPlantFilteredDataObject = {}
-    //     powerPlantFilteredDataObject[`${key}`] = value;
-    //     powerPlantFilteredData.push(powerPlantFilteredDataObject)
-    //   });
-    //   // console.log(powerPlantFilteredData)
-    // });
-  });
-}
 
 /////
 // Function to initialize stats table
@@ -204,7 +210,84 @@ function initStat() {
   });
 }
 
-init();
+
+/////
+// Function to initialize page
+/////
+function init() {
+  initMap();
+  initTable();
+  initStat();
+}
+
+/////
+// Function to store user chosen filters
+/////
+function mapFilter() {
+  var selectedFilters = {};
+  var localStateSelectValue = locationStateSelect.property("value");
+  var localEnergySelectValue = locationEnergySelect.property("value");
+  var localYearSelectValue = locationYearSelect.property("value");
+
+  if (localStateSelectValue) {
+    selectedFilters["state"] = localStateSelectValue;
+    console.log("date Not empty");
+  }
+  if (localEnergySelectValue) {
+    selectedFilters["primary_fuel"] = localEnergySelectValue;
+    console.log("energy Not empty");
+  }
+  if (localYearSelectValue) {
+    selectedFilters["commissioning_year"] = localYearSelectValue;
+    console.log("year Not empty");
+  }
+
+  return selectedFilters;
+}
+
+/////
+// Function to filter map
+/////
+function filterData() {
+  var selectedFilters = mapFilter();
+
+  state_name = selectedFilters["state"];
+  energy = selectedFilters["primary_fuel"];
+  year = selectedFilters["commissioning_year"];
+
+  removeLayers();
+
+  d3.json(`/map_filter/${state_name}/${energy}/${year}`).then((data) => {
+    console.log(data);
+
+    var markerArray = [];
+    for (var i = 0; i < data.length; i++) {
+      allLocations = [data[i].latitude, data[i].longitude];
+
+      marker = L.marker(allLocations).bindPopup(`
+              <p><strong> Name: </strong> ${data[i].name} </p>
+              <hr>
+              <p><strong> Commission Year: </strong> ${data[i].commissioning_year} </p>
+              <p><strong> Primary Fuel Type: </strong> ${data[i].primary_fuel} </p>
+            `);
+      markerArray.push(marker);
+    }
+    markerClusterGroup.addLayers(markerArray);
+
+    markerClusterGroup.addTo(myMap);
+  });
+}
+
+function removeLayers() {
+  markerClusterGroup.clearLayers();
+  myMap.removeLayer(markerClusterGroup);
+}
+
+function resetData() {
+  removeLayers();
+  initMap()
+}
+
 
 /////
 // Function to create interactive Stats Table
@@ -584,7 +667,7 @@ L.tileLayer(
     tileSize: 512,
     maxZoom: 18,
     zoomOffset: -1,
-    id: "mapbox/dark-v10",
+    id: "mapbox/streets-v11",
     accessToken: API_KEY,
   }
 ).addTo(myMap);

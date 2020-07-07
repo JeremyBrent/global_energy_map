@@ -40,8 +40,8 @@
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-   <!-- Leaflet-Choropleth JavaScript
-   <script type="text/javascript" src="static/js/choropleth.js"></script> -->
+   <!-- Leaflet-Choropleth JavaScript -->
+   <script type="text/javascript" src="../static/js/choropleth.js"></script>
 
    <script src = "../static/js/Leaflet-heat.js"></script>
 
@@ -134,65 +134,24 @@
               <div class = "filter-button-div">
                 <button class = "filter-button" onclick="filterData()"> Filter Map </button>
               </div>
+              <div class = "reset-button-div">
+                <button class = "reset-button" onclick="resetData()"> Reset Map </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="map-container">
         <h2> Production </h2>
-        <div class="row justify-content-between">
-          <div class="col-sm-8">
+        <div class='row'>
+          <div class = "col-sm">
+            
             <div id="map2"></div>
-          </div>
-          <div class="col-sm-4">
-            <div class="panel-group">
-              <div class="panel panel-default" style="box-shadow: 0px 0px 10px;">
-                <div class="panel-heading">
-                  State
-                </div>
-                <div id="state_div" class="panel-collapse collapse in">
-                  <div class="panel-body">
-                    <select id="prod_state_select" name="state_select" class="form-control">
-                      <option value="All">All</option>
-                      
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="panel panel-default indiv-selector" style="box-shadow: 0px 0px 10px;">
-                <div class="panel-heading">
-                  Energy Type
-                </div>
-                <div id="program_collapse" class="panel-collapse collapse in">
-                  <div class="panel-body">
-                    <select id="prod_energy_select" name="energy_select" class="form-control">
-                      <option value="All">All</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="panel panel-default indiv-selector" style="box-shadow: 0px 0px 10px;">
-                <div class="panel-heading">
-                  Commission Year
-                </div>
-                <div id="program_collapse" class="panel-collapse collapse in">
-                  <div class="panel-body">
-                    <select id="prod_year_select" name="year_select" class="form-control">
-                      <option value="All">All</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-
-      
       <div id="table-area" style="padding:5px;margin-bottom:50px;">
-        <table id="energy-table" class="display" style=" width:100%;">
+        <table id="energy-table" class="display" style=" width:100%;"></table>
       </div>
     </div>
   </div>
