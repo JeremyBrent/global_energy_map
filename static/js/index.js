@@ -21,7 +21,7 @@ var markerClusterGroup = L.markerClusterGroup();
 /////
 function initMap() {
   d3.json("/all_energy").then((data) => {
-    console.log(data);
+    // console.log(data);
     // Preparing data for the marker cluster map 1
     var markerArray = [];
     for (var i = 0; i < data.length; i++) {
@@ -112,7 +112,7 @@ function initTable() {
 /////
 function initStat() {
   d3.json("/all_energy").then((data) => {
-    console.log(data);
+    // console.log(data);
 
     var difEnergy = [...new Set(data.map((x) => x.primary_fuel).sort())];
 
@@ -132,7 +132,7 @@ function initStat() {
       sum += item.generation_gwh_2017;
     });
 
-    console.log(data);
+    // console.log(data);
 
     var allStationsSum = sum.toFixed(2);
     var allStationsCount = data.length;
@@ -168,15 +168,15 @@ function mapFilter() {
 
   if (localStateSelectValue) {
     selectedFilters["state"] = localStateSelectValue;
-    console.log("date Not empty");
+    // console.log("date Not empty");
   }
   if (localEnergySelectValue) {
     selectedFilters["primary_fuel"] = localEnergySelectValue;
-    console.log("energy Not empty");
+    // console.log("energy Not empty");
   }
   if (localYearSelectValue) {
     selectedFilters["commissioning_year"] = localYearSelectValue;
-    console.log("year Not empty");
+    // console.log("year Not empty");
   }
 
   return selectedFilters;
@@ -195,7 +195,7 @@ function filterData() {
   removeLayers();
 
   d3.json(`/map_filter/${state_name}/${energy}/${year}`).then((data) => {
-    console.log(data);
+    // console.log(data);
 
     var markerArray = [];
     for (var i = 0; i < data.length; i++) {
@@ -218,11 +218,13 @@ function filterData() {
 function removeLayers() {
   markerClusterGroup.clearLayers();
   myMap.removeLayer(markerClusterGroup);
+
 }
 
 function resetData() {
+  $('select').prop('selectedIndex', 0);
   removeLayers();
-  initMap()
+  initMap();
 
   // locationStateSelect.select("option").text("All");
   // locationEnergySelect = d3.select("option").text("All");
