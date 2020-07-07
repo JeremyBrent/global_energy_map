@@ -2,6 +2,7 @@ body, html {
     padding: 0;
     margin: 0;
     scroll-behavior: smooth;
+    cursor: default;
   }
 
 #map {
@@ -11,7 +12,7 @@ body, html {
     position: absolute;
     z-index: 0;
     margin-right: 50px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,1);
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
 #map_2 {
@@ -21,15 +22,27 @@ body, html {
     position: static;
     z-index: 0;
     margin-right: 50px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,1);
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
-.filter-button-div {
+.filter-button {
     margin-top:25px;
+    border-radius: 5px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
+    background-color: white;
+    text-align: center;
+    line-height: 2;
+    cursor: pointer;
 }
 
-.reset-button-div {
+.reset-button {
     margin-top:25px;
+    border-radius: 5px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
+    background-color: white;
+    text-align: center;
+    line-height: 2;
+    cursor: pointer;
 }
 
 .container {
@@ -52,15 +65,12 @@ body, html {
 
 .get-started-div {
     position:absolute;
-    margin-left:auto;
-    margin-right:auto;
     left:0;
     right:0; 
     text-align:center;
     z-index: 1;
     display:block;
     top: 60%;
-
 }
 
 .get-started-button {
@@ -68,6 +78,10 @@ body, html {
     width:125px;
     border-radius:5px;
     text-decoration: none;
+    background-color: white;
+    margin-left: auto;
+    margin-right:auto;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
 .header {
@@ -98,7 +112,7 @@ body, html {
     z-index:1;
     background-color:white;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
 .header-title{
@@ -122,27 +136,25 @@ body, html {
 }
 
 
-
 .footer{
     height:100px;
     width:100%;
     position:relative;
+    background-color: #f1f1f1;
 }
 
-.authors  {
-    text-align: center;
-    margin-top:40px;
-
-}
-
-.year {
+.footer-div {
+    height:100%;
     text-align:center;
-    margin-bottom:25px;
 }
 
-.citation{
+label {
+    display:block;
     text-align: center;
-    margin-bottom:40px;
+}
+
+.authors {
+    padding-top: 15px;
 }
 
 .energyTypeStats {
@@ -151,7 +163,7 @@ body, html {
 .stats-table {
     background-color: white;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 
 }
 
@@ -174,7 +186,11 @@ body, html {
     }
 
     .map-container {
-        height: 1010px;
+        height: 1100px;
+    }
+
+    .map-container-2 {
+        height:570px;
     }
 
     .header-title {
