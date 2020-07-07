@@ -118,7 +118,7 @@ function initStat() {
 
     var dropDown = d3.select(".energyTypeStats");
     var tbody = d3.select(".stats-table-body tr");
-
+    
     for (var i = 0; i < difEnergy.length; i++) {
       dropDown
         .append("option")
@@ -236,19 +236,18 @@ function resetData() {
 function onChangeStatsTable(fuel_type) {
   var tbody = d3.select(".stats-table-body tr");
 
-  d3.json(`/filter_stats_table/${fuel_type}`).then((data) => {
-    console.log(data);
-    tbody.selectAll("td").remove();
+  tbody.selectAll("td").remove();
 
-    if (fuel_type == "All") {
-      initStat();
-    } else {
+  if (fuel_type == "All") {
+    initStat();
+  } else {
+    d3.json(`/filter_stats_table/${fuel_type}`).then((data) => {
       tbody.append("td").text(numberWithCommas(data.num_power_plants));
       tbody.append("td").text(numberWithCommas(data.total_prod.toFixed(2)));
       tbody.append("td").text(numberWithCommas(data.avg_prod.toFixed(2)));
       tbody.append("td").text(numberWithCommas(data.percent_prod.toFixed(2)));
-    }
-  });
+    })
+  };
 }
 
 /////////////
