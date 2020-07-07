@@ -675,9 +675,10 @@ L.tileLayer(
 // Map 2
 // Choropleth of production
 
-var myMap2 = L.map("map2", {
+var myMap2 = L.map("map_2", {
   center: [39.8283, -98.5795],
-  zoom: 4,
+  zoom: 3,
+  maxZoom: 18,
 });
 
 // Adding tile layer to the map
