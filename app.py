@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, func
 
 from flask import Flask, jsonify, render_template
 
-from config import username, password, username_heroku, password_heroku, database_heroku, host_heroku
+from config import username_heroku, password_heroku, database_heroku, host_heroku
 
 connection_string = f"{username_heroku}:{password_heroku}@{host_heroku}:5432/{database_heroku}"
 engine = create_engine(f'postgresql://{connection_string}')
