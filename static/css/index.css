@@ -1,18 +1,9 @@
-body {
+body, html {
     padding: 0;
     margin: 0;
-    /* position:fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0; */
-  }
-  
-body,
-html {
     scroll-behavior: smooth;
-}
-
+    cursor: default;
+  }
 
 #map {
     height: 500px;
@@ -21,22 +12,44 @@ html {
     position: absolute;
     z-index: 0;
     margin-right: 50px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,1);
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
-#map2 {
+#map_2 {
     height: 500px;
     width:100%;
     border-radius: 5px;
-    position: absolute;
+    position: static;
     z-index: 0;
     margin-right: 50px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,1);
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
+}
+
+.filter-button {
+    margin-top:25px;
+    border-radius: 5px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
+    background-color: white;
+    text-align: center;
+    line-height: 2;
+    cursor: pointer;
+}
+
+.reset-button {
+    margin-top:25px;
+    border-radius: 5px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
+    background-color: white;
+    text-align: center;
+    line-height: 2;
+    cursor: pointer;
 }
 
 .container {
     padding-top: 50px;
-    height:100%
+    height:auto;
+    width:auto;
+    max-width: 1200px;
 }
 
 .gridContainer {
@@ -47,20 +60,17 @@ html {
 .map-container {
     height: 600px;
     width:100%;
-    margin:0
+    margin:0;
 }
 
 .get-started-div {
     position:absolute;
-    margin-left:auto;
-    margin-right:auto;
     left:0;
     right:0; 
     text-align:center;
     z-index: 1;
     display:block;
     top: 60%;
-
 }
 
 .get-started-button {
@@ -68,6 +78,10 @@ html {
     width:125px;
     border-radius:5px;
     text-decoration: none;
+    background-color: white;
+    margin-left: auto;
+    margin-right:auto;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
 .header {
@@ -98,7 +112,7 @@ html {
     z-index:1;
     background-color:white;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 }
 
 .header-title{
@@ -122,13 +136,26 @@ html {
 }
 
 
-.citation {
-    text-align:right;
-    margin:15px;
-    margin-right: 0px;
+.footer{
+    height:100px;
+    width:100%;
+    position:relative;
+    background-color: #f1f1f1;
+}
+
+.footer-div {
+    height:100%;
+    text-align:center;
+}
+
+label {
     display:block;
-    font-size:15px;
-  }
+    text-align: center;
+}
+
+.authors {
+    padding-top: 15px;
+}
 
 .energyTypeStats {
     border-radius:5px;
@@ -136,7 +163,7 @@ html {
 .stats-table {
     background-color: white;
     border-radius: 5px;
-    box-shadow: 0px 0px 10px;
+    box-shadow: rgba(0,0,0,.15) 0px 0px 4px 4px;
 
 }
 
@@ -159,10 +186,31 @@ html {
     }
 
     .map-container {
-        height: 900px;
+        height: 1100px;
+    }
+
+    .map-container-2 {
+        height:570px;
     }
 
     .header-title {
         top:40%
     }
+    .filter-button {
+        width:100%;
+    }
+    
+    .reset-button {
+        width:100%;
+    }
+
+    #map, #map2 {
+        width:96%
+    }
+}
+
+@media screen and (max-width:320) {
+    .header-title {
+        top:30%;
+    } 
 }

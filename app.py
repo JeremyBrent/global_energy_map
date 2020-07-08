@@ -252,6 +252,13 @@ def map_filter(state_name, energy, year):
                 power_plants_data.state).\
                 filter(power_plants_data.state == state_name).all()
 
+    ################
+    if energy == "All" and state_name == "All" and year == "All":
+        data = session.query(power_plants_data.name, 
+            power_plants_data.latitude, power_plants_data.longitude, 
+            power_plants_data.primary_fuel, power_plants_data.commissioning_year,
+            power_plants_data.state).all()
+
     session.close()
 
     all_rows = []
