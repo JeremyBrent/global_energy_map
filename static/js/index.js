@@ -116,12 +116,18 @@ function initStat() {
 
     var dropDown = d3.select(".energyTypeStats");
     var tbody = d3.select(".stats-table-body tr");
-    
+
+    dropDown.selectAll("option").remove();
+
+    dropDown.append("option")
+            .attr("value", `All`)
+            .text("All");
+
     for (var i = 0; i < difEnergy.length; i++) {
-      dropDown
-        .append("option")
-        .attr("value", `${difEnergy[i]}`)
-        .text(difEnergy[i]);
+        dropDown
+          .append("option")
+          .attr("value", `${difEnergy[i]}`)
+          .text(difEnergy[i]);
     }
 
     var sum = 0;
